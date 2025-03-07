@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FaDatabase, FaMagic } from "react-icons/fa";
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export default function Home() {
   const predefinedQueries = [
     { label: "Top 5 customers", query: "SELECT customer_name, SUM(amount) FROM transactions GROUP BY customer_name ORDER BY SUM(amount) DESC LIMIT 5;" },
