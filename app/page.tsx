@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { FaDatabase, FaMagic, FaChartBar } from "react-icons/fa";
+import { FaDatabase, FaMagic } from "react-icons/fa";
 
 export default function Home() {
   const predefinedQueries = [
