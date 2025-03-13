@@ -1,21 +1,44 @@
+"use client";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaCopy, FaCheck } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function QueryResult({ query }) {
+export default function QueryResult() {
+  const searchParams = useSearchParams();
+  const sqlQuery = searchParams.get("sql") || "No query generated";
+  const router = useRouter();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(sqlQuery);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000); 
+  };
+
   return (
-    <div className="w-full h-screen bg-black text-white relative overflow-hidden flex flex-col items-center justify-center">
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#121212] to-gray-900 animate-gradient"></div>
+    <div className="w-full h-screen bg-black text-white flex flex-col items-center justify-center">
       <Navbar />
-      <div className="relative flex flex-col items-center text-center p-6 w-full max-w-2xl">
-        <h1 className="text-5xl font-extrabold mb-6 text-gray-200">Generated SQL</h1>
+      <div className="p-6 max-w-2xl text-center">
+        <h1 className="text-4xl font-extrabold mb-6">Generated SQL</h1>
         
-        <div className="bg-[#1E1E1E] text-gray-300 p-6 rounded-lg shadow-md border border-gray-700 w-full text-left text-sm md:text-base font-mono overflow-auto">
-          <pre>{query}</pre>
+        <div className="relative bg-gray-800 p-12 rounded-lg text-sm font-mono overflow-auto w-full">
+          <pre className="text-left">{sqlQuery}</pre>
+          <button
+            onClick={handleCopy}
+            className="absolute top-3 right-3 p-2 text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg"
+          >
+            {copied ? <FaCheck className="text-green-400" /> : <FaCopy />}
+          </button>
         </div>
         
-        <Button className="mt-6 py-4 px-6 text-lg font-semibold gap-3 bg-purple-600 hover:bg-purple-700 shadow-lg cursor-pointer flex items-center">
-          <FaArrowLeft className="text-xl" /> Generate Another Query
+        <Button
+          className="mt-6 bg-purple-600 hover:bg-purple-700 flex items-center"
+          onClick={() => router.push("/create")}
+        >
+          <FaArrowLeft className="mr-2" /> Generate Another Query
         </Button>
       </div>
     </div>
