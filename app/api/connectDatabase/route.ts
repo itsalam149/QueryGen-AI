@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import pkg from "pg"; // Import PostgreSQL client
+import pkg from "pg"; 
 const { Client } = pkg;
 
-export async function POST(req: Response) {
+export async function POST(req: Request) {
   try {
     const { host, port, database, user, password } = await req.json();
 
