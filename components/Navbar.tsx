@@ -23,7 +23,7 @@ const Navbar = () => {
               Link SQL
             </Link>
             <Button asChild className="bg-color-primary text-color-primary-foreground hover:bg-color-primary/90 transition-colors">
-              <a href="https://github.com/zunxii" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+              <a href="https://github.com/zunxii/QueryGen-AI" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                 <FaGithub className="text-lg" /> GitHub
               </a>
             </Button>

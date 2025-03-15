@@ -1,2 +1,6 @@
 postgresql://neondb_owner:npg_gKR4zODq3pYb@ep-rough-tooth-a5soqm9c-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
 
+Password - npg_gKR4zODq3pYb
+
+Get me the top customer by total sales. Coloumn names are name and total_sales.
+Get me all customers whose Name started with A. Coloumn names are name and total_sales.
