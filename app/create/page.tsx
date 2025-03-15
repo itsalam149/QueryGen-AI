@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 export default function CreateQuery() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isPending, startTransition] = useTransition(); // Handles smooth route transition
+  const [isPending, startTransition] = useTransition(); 
   const router = useRouter();
 
   const handleGenerate = async () => {
@@ -24,7 +24,6 @@ export default function CreateQuery() {
 
       const data = await response.json();
       if (data.sql) {
-        // Transition for smooth navigation effect
         startTransition(() => {
           router.push(`/query?sql=${encodeURIComponent(data.sql)}`);
         });

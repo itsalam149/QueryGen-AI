@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize Gemini AI
+
 const apiKey = process.env.GEMINI_API_KEY ?? "";
 const genAI = new GoogleGenerativeAI(apiKey);
 
@@ -26,11 +26,9 @@ export async function POST(req: Request) {
 
         const chatSession = model.startChat({ generationConfig, history: [] });
 
-        // Send the query to Gemini
-        const result = await chatSession.sendMessage(`Convert this natural language query to SQL: ${query}`);
+        const result = await chatSession.sendMessage(`Convert this natural language query to SQL without any comments: ${query}`);
         const sqlResponse = result.response.text();
 
-        // Extract SQL from markdown code block
         const match = sqlResponse.match(/```sql\n([\s\S]*?)\n```/);
         const cleanSQL = match ? match[1].trim() : sqlResponse.trim();
 

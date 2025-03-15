@@ -26,21 +26,24 @@ export default function ConnectDatabase() {
     e.preventDefault();
     setLoading(true);
     setPopup(null);
-
+  
     try {
       const response = await fetch("/api/connectDatabase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dbConfig),
       });
-
+  
       const data = await response.json();
       if (data.success) {
+        // Store database credentials in localStorage
+        localStorage.setItem("dbConfig", JSON.stringify(dbConfig));
+  
         setPopup({ message: "Database connected successfully! Redirecting...", type: "success" });
-
+  
         setTimeout(() => {
           setPopup(null);
-          router.push("/executeSQL"); // Redirect to the query execution page
+          router.push("/executeSQL");
         }, 1500);
       } else {
         setPopup({ message: "Connection failed: " + (data.error || "Unknown error"), type: "error" });
@@ -52,6 +55,7 @@ export default function ConnectDatabase() {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="w-full h-screen bg-black text-white flex flex-col items-center justify-center relative">

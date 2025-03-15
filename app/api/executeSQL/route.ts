@@ -1,45 +1,66 @@
 import { NextResponse } from "next/server";
-import { decrypt } from "@/lib/crypto";  // Decrypt password
-import { Client } from "pg";  // PostgreSQL Client
-import prisma from "@/lib/prisma";  // Prisma DB connection
+import { Client } from "pg"; // PostgreSQL Client
 
 export async function POST(req: Request) {
   try {
-    const { userId, sql } = await req.json(); // Get user ID and SQL query
+    const body = await req.json(); 
+    console.log("Received Request Body:", body); 
 
-    // Retrieve stored database credentials
-    const userDbConfig = await prisma.userDatabase.findUnique({
-      where: { id: Number(userId) },  
-    });
-
-    if (!userDbConfig) {
-      return NextResponse.json({ success: false, error: "Database not connected" });
+    const { dbConfig, sql } = body;
+    
+    if (!dbConfig || !sql) {
+      return NextResponse.json({ success: false, error: "Database connection details and SQL query are required." }, { status: 400 });
     }
 
-    // Decrypt the stored password
-    const decryptedPassword = decrypt(userDbConfig.encryptedPassword);
+    const { host, port, user, password, database, ssl } = dbConfig;
 
-    // Connect to user's database
+    if (!host || !port || !user || !password || !database) {
+      return NextResponse.json({ success: false, error: "Incomplete database credentials." }, { status: 400 });
+    }
+
+    const handleGenerate = async (query : string) => {
+      if (!query) return;  
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/generateSQL`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query }),
+        });
+  
+        return await response.json();
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong!");
+      } finally {
+      }
+    };
+    const ans = await handleGenerate(sql);
+    // Create PostgreSQL client with dynamic credentials
     const client = new Client({
-      host: userDbConfig.host,
-      port: Number(userDbConfig.port) || 5432, // Ensure port is a number
-      user: userDbConfig.user,
-      password: decryptedPassword,
-      database: userDbConfig.database,
+      host,
+      port: Number(port) || 5432, 
+      user,
+      password,
+      database,
+      ssl: ssl !== false ? { rejectUnauthorized: false } : undefined, 
     });
 
-    await client.connect(); // Connect to DB
-
     try {
-      const result = await client.query(sql); // Execute SQL query
-      await client.end(); // Close connection
-      return NextResponse.json({ success: true, data: result.rows });
+      await client.connect();
+      console.log("Executing SQL Query:", ans); 
+      const result = await client.query(ans.sql); // Execute query
+      return NextResponse.json({ success: true, data: result.rows }); // Return query result
     } catch (queryError) {
-      console.error("SQL Error:", queryError);
-      return NextResponse.json({ success: false, error: "Query execution failed" });
+      console.error("SQL Execution Error:", queryError);
+      const errorMessage = queryError instanceof Error ? queryError.message : "Query execution failed";
+      return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
+    } finally {
+      await client.end(); // Always close connection
     }
   } catch (error) {
     console.error("Server Error:", error);
-    return NextResponse.json({ success: false, error: "Internal server error" });
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
+
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }

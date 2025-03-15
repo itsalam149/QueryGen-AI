@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
+import Navbar from "@/components/Navbar";
 
 interface QueryResult {
   rows: Record<string, string | number>[];
@@ -12,12 +13,28 @@ export default function ExecuteSQL() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<QueryResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dbConfig, setDbConfig] = useState<Record<string, string> | null>(null);
+
+  // Load DB credentials from localStorage on mount
+  useEffect(() => {
+    const storedDbConfig = localStorage.getItem("dbConfig");
+    if (storedDbConfig) {
+      setDbConfig(JSON.parse(storedDbConfig));
+    } else {
+      setError("Database connection is missing. Please reconnect.");
+    }
+  }, []);
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setQuery(e.target.value);
   };
 
   const handleExecute = async () => {
+    if (!dbConfig) {
+      setError("Database connection is missing. Please reconnect.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setResult(null);
@@ -26,7 +43,7 @@ export default function ExecuteSQL() {
       const response = await fetch("/api/executeSQL", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sql: query }),
+        body: JSON.stringify({ sql: query, dbConfig }),
       });
 
       const data: { success: boolean; data?: QueryResult; error?: string } = await response.json();
@@ -38,7 +55,7 @@ export default function ExecuteSQL() {
       }
     } catch (err) {
       setError("Unexpected error occurred");
-      console.log(err);
+      console.error("Execution Error:", err);
     } finally {
       setLoading(false);
     }
@@ -46,6 +63,7 @@ export default function ExecuteSQL() {
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center relative">
+      <Navbar/>
       <div className="absolute inset-0 bg-gradient-to-br from-black via-[#121212] to-gray-900 animate-gradient"></div>
 
       <div className="z-10 w-full max-w-2xl flex flex-col items-center">
@@ -63,8 +81,10 @@ export default function ExecuteSQL() {
           {loading ? <Loader /> : "Execute"}
         </Button>
 
-        {/* Show Query Result or Error */}
+        {/* Show Error Message */}
         {error && <div className="mt-4 text-red-500">{error}</div>}
+
+        {/* Show Query Result */}
         {result && (
           <div className="mt-4 w-full bg-gray-800 p-4 rounded">
             <h3 className="font-bold text-lg mb-2 text-white">Query Result:</h3>

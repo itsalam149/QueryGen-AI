@@ -2,16 +2,8 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FaDatabase, FaMagic } from "react-icons/fa";
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 export default function Home() {
-  const predefinedQueries = [
-    { label: "Top 5 customers", query: "SELECT customer_name, SUM(amount) FROM transactions GROUP BY customer_name ORDER BY SUM(amount) DESC LIMIT 5;" },
-    { label: "Sales per month", query: "SELECT MONTH(date) AS month, SUM(amount) FROM sales GROUP BY MONTH(date);" },
-    { label: "Employees with salary > 50K", query: "SELECT * FROM employees WHERE salary > 50000;" },
-    { label: "Most popular product", query: "SELECT product_name, COUNT(*) FROM orders GROUP BY product_name ORDER BY COUNT(*) DESC LIMIT 1;" },
-    { label: "Revenue per category", query: "SELECT category, SUM(price * quantity) FROM products GROUP BY category;" },
-    { label: "Inactive users", query: "SELECT * FROM users WHERE last_login < NOW() - INTERVAL 6 MONTH;" },
-  ];
 
   return (
     <div className="w-full h-screen bg-black text-white relative overflow-hidden flex flex-col items-center justify-center">
@@ -22,6 +14,7 @@ export default function Home() {
         <h2 className="text-lg text-gray-100 max-w-xl tracking-wide">Generate Custom Query from Text</h2>
         <h3 className="text-md text-gray-400 mb-6 max-w-xl tracking-wide">
           AI-powered SQL query generator for quick and efficient database queries.
+          <br/> Now You can connect your DB and use NL queries directly.
         </h3>
         
         <Link href="/create" className="w-full py-6 gap-3">
@@ -37,17 +30,6 @@ export default function Home() {
       </Link>
         
         <div className="max-w-2xl w-full text-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-300 border-b border-gray-700 pb-2">Predefined Queries</h3>
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mt-4">
-          {predefinedQueries.map((item, index) => (
-            <div 
-              key={index} 
-              className="p-4 bg-[#1E1E1E] rounded-lg shadow-md border border-gray-700 text-gray-300 text-center flex items-center justify-center gap-3 hover:bg-gray-800 transition duration-300 text-sm font-medium cursor-pointer"
-            >
-              <FaChartBar className="text-lg text-gray-400" /> {item.label}
-            </div>
-          ))}
-        </div> */}
         </div>
       </div>
     </div>

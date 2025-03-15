@@ -1,19 +1,30 @@
 import { NextResponse } from "next/server";
-import { encrypt } from "@/lib/crypto";
-import prisma from "@/lib/prisma";
+import pkg from "pg"; // Import PostgreSQL client
+const { Client } = pkg;
 
-export async function POST(req: Request) {
+export async function POST(req: Response) {
   try {
-    const { host, port, user, password, database } = await req.json();
-    const encryptedPassword = encrypt(password);
+    const { host, port, database, user, password } = await req.json();
 
-    await prisma.userDatabase.create({
-      data: { host, port: Number(port), user, encryptedPassword, database },
+
+    const client = new Client({
+      host,
+      port,
+      database,
+      user,
+      password,
+      ssl: { rejectUnauthorized: false }, 
     });
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Database Connection Error:", error);
-    return NextResponse.json({ success: false, error: "Failed to connect" });
+    await client.connect(); 
+
+    await client.end();
+    return NextResponse.json({ success: true, message: "Database connected successfully!" });
+  } catch (error: unknown) {
+    console.error("DB Connection Error:", error);
+
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
