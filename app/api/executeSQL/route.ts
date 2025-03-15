@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const handleGenerate = async (query : string) => {
       if (!query) return;  
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/generateSQL`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "https://query-gen-ai.vercel.app/"}/api/generateSQL`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query }),
