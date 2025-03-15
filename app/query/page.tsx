@@ -1,20 +1,25 @@
 "use client";
 export const dynamic = "force-dynamic";
+
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { FaArrowLeft, FaCopy, FaCheck } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function QueryResult() {
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [sqlQuery, setSqlQuery] = useState<string>("Loading...");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    setSqlQuery(searchParams.get("sql") || "No query generated");
+    // Get SQL query only when the component is mounted
+    if (searchParams) {
+      setSqlQuery(searchParams.get("sql") || "No query generated");
+    }
   }, [searchParams]);
 
   const handleCopy = () => {
@@ -30,9 +35,9 @@ export default function QueryResult() {
         <h1 className="text-4xl font-extrabold mb-6">Generated SQL</h1>
 
         <div className="relative bg-gray-800 p-12 rounded-lg text-sm font-mono overflow-auto w-full">
-        <Suspense fallback={<p>Loading SQL Query...</p>}>
+          {/* Ensure query is only displayed after fetching */}
           <pre className="text-left">{sqlQuery}</pre>
-        </Suspense>
+
           <button
             onClick={handleCopy}
             className="absolute top-3 right-3 p-2 text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg"
