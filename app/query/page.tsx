@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { FaArrowLeft, FaCopy, FaCheck } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 export default function QueryResult() {
   const searchParams = useSearchParams();
@@ -25,7 +25,9 @@ export default function QueryResult() {
         <h1 className="text-4xl font-extrabold mb-6">Generated SQL</h1>
         
         <div className="relative bg-gray-800 p-12 rounded-lg text-sm font-mono overflow-auto w-full">
+        <Suspense fallback={<p>Loading SQL Query...</p>}>
           <pre className="text-left">{sqlQuery}</pre>
+        </Suspense>
           <button
             onClick={handleCopy}
             className="absolute top-3 right-3 p-2 text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg"
